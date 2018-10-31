@@ -1,48 +1,172 @@
-I = imread('road2.png');
-BW = edge(I(:,:,1),'Sobel');
-figure;
-imshow(BW);
+I = imread('/home/lord/image_processing/data_set/data/freeway00.tif');
 
-%I_gray = I(:,:,1);
-%I_gray1 = im2double(I_gray);
-%I_flat = I_gray1(:);
+I1 = imresize(I,[128,128]);
+BW = edge(I1(:,:,1),'Sobel');
+
+figure;
+imshow(I1);
+
+BW = im2double(BW);
 rad = discrete_radon(BW,180);
 %imshow(im2uint8(rad));
 theta = 0:179;
 [R,xp] = radon(BW,theta);
 figure;
+title("our implementation")
 imagesc(rad);colormap(hot);
-[Y,I] = max(rad(:));
-theta = round(I/size(rad,1))
-ro = mod(I,size(rad,1)) 
+figure;
+title("matlab inbuilt implementation")
+imagesc(R);colormap(hot);
+
+
+%%%%%%%%%%%%approximation checking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% X_vect = X_back(:,1)';
+% X_2d = reshape(X_vect,185,180);
+% figure;
+% imagesc(X_2d);colormap(hot);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[Y1,I1] = max(rad(:));
+[Y2,I2] = max(R(:));
+
+
+theta1 = round(I1/size(rad,1));
+ro1 = mod(I1,size(rad,1)) ;
+
+theta2 = round(I2/size(R,1));
+ro12 = mod(I2,size(R,1)) ;
+
+%plotline_radon(I,ro12, theta2)
 
 
 function R = discrete_radon(I_flat,steps)
 
 %R= zeros(steps,size(I_flat,1));
-R= zeros(2*size(I_flat,1),steps);
-n = 2*size(I_flat,1);
-%sie(R)
-%{
-[N M] = size(I_flat);
-m = round(M/2);
-n = round(N/2);
-
-rhomax = ceil(sqrt(M^2+N^2));
-rc = round(rhomax/2);
-mt = max(theta);
-
-res = cast(zeros(rhomax+1,steps),'double');
-%}
-
+R= zeros(floor(sqrt(2)*size(I_flat,1))+1,steps);
+n = floor(sqrt(2)*size(I_flat,1))+1;
 for s =1:steps
-   %rotation =  imrotate(R,-s*180/steps,'crop');
+   %rotation =  img_rotate(I_flat,s*180/steps);
    rotation =  imrotate(I_flat,-s*180/steps);
    size(rotation);
-   %R(s,:) = sum(rotation,2);
+  
    tmp = size(rotation,1);
    x=floor((n-tmp)/2)+1;
    R(x:x+tmp-1,s) = sum(rotation,2);
+   %R(:,s) = sum(rotation,2);
+   
 end
 
 end
+
+
+
+
+function an = sor(n,R)
+    [r,c] = size(R);
+    sort = zeros(r*c,2);
+    sort(:,1) = R(:);
+    sort(:,2) = 1:r*c;
+    %sort
+    for i = 2:r*c
+        if(i > n)
+            k =n;
+            pos = n+1;
+        else
+            k = i-1;
+            pos = i;
+        end
+        tmp = sort(i,:);
+        for j= k:-1:1
+            if(sort(j) < tmp(1))
+                sort(j+1,:) = sort(j,:);
+                pos = pos-1;
+            else
+                break
+            end
+        end
+        sort(pos,:) = tmp;
+        %sort
+    end
+    an = zeros(n,3);
+    an(:,1) = sort(1:n);
+    an(:,2) = mod(sort(1:n,2),r);
+    an(:,3) = floor((sort(1:n,2)-1)/r)+1;
+    for i=1:n
+        if(an(i,2) == 0)
+            an(i,2) = r;
+        end
+    end
+end
+
+
+function transform_img = trasform_2d(T, input_img)
+
+%function perform the 2 D projective transform 
+
+% input_image : gray input image
+
+% T is 3 x 3 trasnform matrix  
+
+%transform_image : output gray transform image
+
+[row,col] = size(input_img);
+
+%transform_img = zeros(floor(sqrt(2)*row)+1,floor(sqrt(2)*col)+1);
+transform_img = zeros(363,363);
+for i=-row:floor(sqrt(2)*row)-row
+for j=-col:floor(sqrt(2)*col)-col
+
+U = inv(T)*[i j 1]';      % where ‘ is transpose
+
+if(U(3)>1)                       % in case of 8 dof projective transform
+
+U(1) = U(1)/U(3); %% taking care homogeneous co ordinate
+U(2) = U(2)/U(3);
+end
+
+if((U(1)>0)&&(U(1)<row-1)&&(U(2)>0)&&(U(2)<col-1)) %% consider only points                                                                                                                 %which lie inside of input image
+
+transform_img(round(i+row+1),round(j+col+1)) =  input_img(round(U(1)+1),round(U(2)+1));                                       input_img(round(U(1)+1),round(U(2)+1));
+
+end
+
+end
+end
+
+end
+
+function rotate_img = img_rotate(input_img,angel)
+
+
+sc = cosd(angel);
+ss = sind(angel);
+
+T = [sc ss 0;-ss sc 0;0 0 1];
+rotate_img = trasform_2d(T, input_img);
+
+end
+
+function plotline_radon(img,ro, theta)
+
+%[height,width,channel] = size(img)
+
+%Y = (-cos(theta)/sin(theta))X + ro/sin(theta) 
+%imshow(img); %// Show the image
+%hold on; %// Hold so we can draw lines
+ %// or numel(theta);
+
+%// These are constant and never change
+for width = 2:size(img,1)
+    
+    X = size(img,1) -width
+    
+    Y = round((-cos(theta)/sind(theta))*X + sqrt(ro))
+    
+    if(Y>1)&&(Y<size(img,2)-1) && (X>1)&&(X<size(img,1)-1) 
+    img(Y-1:Y+1,X-1:X+1,3) = 255;
+    end
+end
+imshow(img)
+end
+
