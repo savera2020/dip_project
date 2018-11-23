@@ -1,5 +1,5 @@
 
-I = imread('/home/lord/dip_project/sample_images/freeway00.tif');
+I = imread('/home/lord/dip_project/sample_images/overpass36.tif');
 %I = imread('/home/lord/dip_project/sample_images/road.png');
 I_1 = imresize(I,[128,128]);
 BW = edge(I_1(:,:,1),'Sobel');
@@ -49,9 +49,9 @@ if(theta1>90)
     
 else 
     theta1  = 180-theta1;
-    ro_d = 1.414*(ro1+(size(rad,1)));
+    ro_d = 1.414*(67+(size(rad,1))
 end
-plotline_radon(I_1,ro_d, theta1)
+plotline_radon(I_1,), theta1)
 
 function R = discrete_radon(I_flat,steps)
 
