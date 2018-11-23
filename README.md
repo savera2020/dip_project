@@ -1,8 +1,10 @@
 # dip_project
-#### data set taken from 
+### Road detection with radon transfom approximation  
 
-http://weegee.vision.ucmerced.edu/datasets/landuse.html
 
-#### Matlab reference link
+**data set taken from** [link](http://weegee.vision.ucmerced.edu/datasets/landuse.html)
 
-https://in.mathworks.com/help/images/detect-lines-using-the-radon-transform.html 
+**Matlab reference** [link](https://in.mathworks.com/help/images/detect-lines-using-the-radon-transform.html)
+
+
+**results**
