@@ -1,23 +1,43 @@
 
-I = imread('/home/lord/dip_project/sample_images/freeway00.tif');
+%I = imread('/home/lord/dip_project/sample_images/overpass36.tif');
 %I = imread('/home/lord/dip_project/sample_images/road.png');
-I_1 = imresize(I,[128,128]);
-BW = edge(I_1(:,:,1),'Sobel');
 
-figure;
-imshow(I_1);
+function radon_transform(I,mode)
+I_1 = imresize(I,[128,128]);
+%BW = I_1;
+%BW = edge(I_1(:,:,1),'Sobel');
+if (mode == true)
+    BW = edge(I_1(:,:,1),'Sobel');
+      figure,
+    subplot(2,2,1);
+    imshow(BW);colormap gray
+    title('input_image')
+else
+    BW  =rgb2gray(I_1);
+    figure,
+    subplot(2,2,1);
+    imshow(I_1);colormap gray
+    title('input_image')
+end
+
+
 
 BW = im2double(BW);
 rad = discrete_radon(BW,180);
 %imshow(im2uint8(rad));
 theta = 0:179;
 [R,xp] = radon(BW,theta);
-figure;
-title("our implementation")
-imagesc(rad);colormap(hot);
-figure;
-title("matlab inbuilt implementation")
-imagesc(R);colormap(hot);
+
+
+subplot(2,2,2); imagesc(rad);colormap(hot);
+title("Radon implementation")
+
+subplot(2,2,3); surf(rad);
+
+title("Radon 3D")
+%figure;
+%title("matlab inbuilt implementation")
+%imagesc(R);colormap(hot);
 
 
 %%%%%%%%%%%%approximation checking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,8 +52,14 @@ imagesc(R);colormap(hot);
 [Y2,I2] = max(R(:));
 
 
+
 theta1 = round(I1/size(rad,1));
-ro1 = mod(I1,size(rad,1)) ;
+ro1 = mod(I1,size(rad,1)) 
+
+
+
+an = sor(10,rad);
+
 
 theta2 = round(I2/size(R,1));
 ro12 = mod(I2,size(R,1)) ;
@@ -183,7 +209,11 @@ for X = 1:128
     
     end
 end
+subplot(2,2,4);
 imshow(img)
+title('ploted line')
 %imwrite(img,'/home/lord/dip_project/result/overpass36.tif')
+end
+
 end
 

@@ -1,6 +1,6 @@
 clear ; close all; clc
 
-myPath= '/home/lord/image_processing/data_set/data/';
+myPath= '/home/lord/data/';
 
 a=dir(fullfile(myPath,'*.tif'));
 fileNames={a.name};
@@ -12,7 +12,7 @@ for count = 1:length(fileNames) %
 
 fileName = strcat(myPath,fileNames(count));  
 img = imread(fileName{1});
-img1 = imresize(img,[128,128]);
+img1 = imresize(img,[64,64]);
 
 img_gray = rgb2gray(img1);
 BW1 = edge(img_gray,'Sobel');
