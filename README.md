@@ -25,4 +25,5 @@ function radon_approximation_test.m inference the radon approximation --input bi
 **Results**
 
 
-![Radon transform](https://github.com/savera2020/dip_project/tree/master/result/3.jpg)
+![Radon transform](https://github.com/savera2020/dip_project/blob/master/result/3.jpg "Figure 1-1")
+![Radon approximation](https://github.com/savera2020/dip_project/blob/master/result/3_C.jpg "Figure 1-2")
